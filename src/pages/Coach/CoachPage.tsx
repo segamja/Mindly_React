@@ -5,11 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateCustomScript, getPresetScript, PRESET_LIST } from '@/data/content';
 import { useMediaPlayer } from '@/hooks/useMediaPlayer';
-import { inferEmotionFromText } from '@/services/media/emotionMapping';
-import { musicService } from '@/services/media/MusicService';
+import { getLocalTrackById } from '@/services/media/localMusic';
 import { useMindlyStore } from '@/store/useMindlyStore';
-import { PRESET_EMOTION } from '@/types/media';
 import type { PresetKey } from '@/types';
+import { PRESET_BGM } from '@/utils/progress';
 
 export function CoachPage() {
   const navigate = useNavigate();
@@ -21,48 +20,41 @@ export function CoachPage() {
   const [customInput, setCustomInput] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const startEmotionMusic = useCallback(
-    async (preset: PresetKey, customText?: string) => {
+  const startPresetMusic = useCallback(
+    async (preset: PresetKey) => {
       if (!musicEnabled) return;
-      const emotion =
-        preset === 'custom'
-          ? inferEmotionFromText(customText ?? '')
-          : PRESET_EMOTION[preset];
-      const track = await musicService.getTrack(emotion);
-      await play(track, emotion);
+      const track = getLocalTrackById(PRESET_BGM[preset]);
+      if (track) await play(track);
     },
     [musicEnabled, play],
   );
 
-  const typeText = useCallback(
-    (text: string, onComplete?: () => void) => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      setScript('');
-      setTyping(true);
-      setDone(false);
-      let i = 0;
+  const typeText = useCallback((text: string, onComplete?: () => void) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setScript('');
+    setTyping(true);
+    setDone(false);
+    let i = 0;
 
-      const tick = () => {
-        if (i < text.length) {
-          setScript((s) => s + text[i]);
-          i++;
-          timerRef.current = setTimeout(tick, 20);
-        } else {
-          setTyping(false);
-          setDone(true);
-          onComplete?.();
-        }
-      };
-      tick();
-    },
-    [],
-  );
+    const tick = () => {
+      if (i < text.length) {
+        setScript((s) => s + text[i]);
+        i++;
+        timerRef.current = setTimeout(tick, 20);
+      } else {
+        setTyping(false);
+        setDone(true);
+        onComplete?.();
+      }
+    };
+    tick();
+  }, []);
 
   const handlePreset = (key: PresetKey) => {
     const preset = getPresetScript(key);
     typeText(preset.script, () => {
       runAiScript(key, preset.label);
-      void startEmotionMusic(key);
+      void startPresetMusic(key);
     });
   };
 
@@ -70,7 +62,7 @@ export function CoachPage() {
     const text = generateCustomScript(customInput);
     typeText(text, () => {
       runAiScript('custom', customInput || '맞춤');
-      void startEmotionMusic('custom', customInput);
+      void startPresetMusic('custom');
     });
   };
 

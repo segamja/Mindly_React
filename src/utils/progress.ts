@@ -3,6 +3,7 @@ import {
   LEVEL_XP,
   XP_REWARDS,
   type DailyMissions,
+  type PresetKey,
   type UserState,
 } from '@/types';
 import { getTodayString } from '@/utils';
@@ -61,6 +62,14 @@ export function ensureMissions(state: UserState): DailyMissions {
 export function allMissionsComplete(missions: DailyMissions): boolean {
   return missions.aiCoaching && missions.breathe && missions.journal;
 }
+
+export const PRESET_BGM: Record<PresetKey, string> = {
+  meeting: 'white-noise',
+  commute: 'desk-stretch',
+  boss: 'burnout-recovery',
+  overtime: 'burnout-recovery',
+  custom: 'burnout-recovery',
+};
 
 export const BREATHE_RECOMMENDATIONS: Record<string, string> = {
   meeting: '오늘은 회의가 많았습니다. 4-2-4 호흡을 추천합니다.',

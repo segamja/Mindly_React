@@ -78,7 +78,7 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
-          globIgnores: ['**/calm-*.jpg', '**/assets/audio/*.mp3'],
+          globIgnores: ['**/calm-*.jpg'],
           navigateFallback: 'index.html',
           navigateFallbackDenylist: [/^\/Mindly_React\/assets\//, /^\/assets\//],
           runtimeCaching: [
@@ -91,11 +91,11 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /soundhelix\.com\/examples\/mp3\//i,
+              urlPattern: /\/assets\/audio\/.*\.mp3$/i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'mindly-fallback-audio',
-                expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 365 },
+                cacheName: 'mindly-local-audio',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
               },
             },
             {

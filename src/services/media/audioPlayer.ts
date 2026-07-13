@@ -1,10 +1,4 @@
 import type { MusicItem } from '@/types/media';
-import { resolveMediaUrl } from './resolveMediaUrl';
-
-const LOCAL_DEFAULT = resolveMediaUrl('assets/default/default.mp3');
-const REMOTE_FALLBACK =
-  'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3';
-
 let audio: HTMLAudioElement | null = null;
 
 function getAudio(): HTMLAudioElement {
@@ -60,20 +54,7 @@ async function playUrl(url: string): Promise<void> {
 }
 
 export async function playSharedTrack(track: MusicItem): Promise<void> {
-  const candidates = [track.url, LOCAL_DEFAULT, REMOTE_FALLBACK];
-  let lastError: unknown;
-
-  for (const url of candidates) {
-    try {
-      await playUrl(url);
-      return;
-    } catch (err) {
-      lastError = err;
-      console.warn('[Mindly] 재생 실패, 다음 소스 시도:', url);
-    }
-  }
-
-  throw lastError instanceof Error ? lastError : new Error('All audio sources failed');
+  await playUrl(track.url);
 }
 
 export function pauseSharedAudio(): void {

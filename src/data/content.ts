@@ -121,3 +121,13 @@ export const PRESET_LIST: { key: PresetKey; label: string }[] = [
   { key: 'commute', label: '출근길 무기력' },
   { key: 'overtime', label: '야근 번아웃' },
 ];
+
+export const TRACKS = [
+  { id: 'white-noise', title: '사무실 백색소음', duration: '5분', levelRequired: 1, src: 'assets/audio/white-noise.mp3' },
+  { id: 'desk-stretch', title: '책상 앞 스트레칭', duration: '3분', levelRequired: 1, src: 'assets/audio/desk-stretch.mp3' },
+  { id: 'meeting-calm', title: '회의 후 진정 호흡', duration: '3분', levelRequired: 1, src: 'assets/audio/desk-stretch.mp3' },
+  { id: 'afternoon-focus', title: '오후 집중 부스터', duration: '5분', levelRequired: 1, src: 'assets/audio/white-noise.mp3' },
+  { id: 'commute-winddown', title: '퇴근길 마음 비우기', duration: '3분', levelRequired: 1, src: 'assets/audio/desk-stretch.mp3' },
+  { id: 'deep-sleep', title: '야근 후 딥슬립', duration: '20분', levelRequired: 3, src: 'assets/audio/deep-sleep.mp3' },
+  { id: 'burnout-recovery', title: '번아웃 회복 명상', duration: '15분', levelRequired: 5, src: 'assets/audio/burnout-recovery.mp3' },
+] as const;

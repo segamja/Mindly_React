@@ -1,36 +1,36 @@
-import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TRACKS } from '@/data/content';
 import { useMediaPlayer } from '@/hooks/useMediaPlayer';
-import { useMusic } from '@/hooks/useMusic';
+import { getLocalTrackById } from '@/services/media/localMusic';
 import { useMindlyStore } from '@/store/useMindlyStore';
 import { useMediaStore } from '@/store/useMediaStore';
-import { EMOTION_LABELS, type EmotionCategory } from '@/types/media';
-import { XP_REWARDS } from '@/utils/progress';
-
-const CATEGORIES = Object.keys(EMOTION_LABELS) as EmotionCategory[];
-
-function formatDuration(seconds: number): string {
-  const min = Math.max(1, Math.round(seconds / 60));
-  return `${min}분`;
-}
+import { XP_REWARDS, getLevelTitle } from '@/utils/progress';
 
 export function LibraryPage() {
-  const [category, setCategory] = useState<EmotionCategory>('stress');
-  const { music, loading, error } = useMusic(category);
-  const { addXp, toggleMusic, musicEnabled } = useMindlyStore();
+  const { userState, addXp, toggleMusic, musicEnabled } = useMindlyStore();
   const { currentMusic, isPlaying } = useMediaStore();
   const { play } = useMediaPlayer();
 
-  const playTrack = async (index: number) => {
-    const track = music[index];
+  const playTrack = async (trackId: (typeof TRACKS)[number]['id']) => {
+    const meta = TRACKS.find((t) => t.id === trackId);
+    if (!meta) return;
+
+    if (userState.level < meta.levelRequired) {
+      alert(`Lv.${meta.levelRequired} (${getLevelTitle(meta.levelRequired)}) 이상 필요합니다.`);
+      return;
+    }
+
+    const track = getLocalTrackById(trackId);
     if (!track) return;
+
     if (!musicEnabled) toggleMusic();
+
     try {
-      await play(track, category);
+      await play(track);
       addXp(XP_REWARDS.audioPlay, track.title);
     } catch {
-      alert('음악을 재생할 수 없습니다. 네트워크 연결을 확인해 주세요.');
+      alert('음악을 재생할 수 없습니다.');
     }
   };
 
@@ -38,72 +38,37 @@ export function LibraryPage() {
     <AppLayout>
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>힐링 라이브러리</CardTitle>
-          <p className="text-sm text-slate-500">AI 감정 기반 · 외부 API + 캐시</p>
+          <CardTitle>콘텐츠 라이브러리</CardTitle>
+          <p className="text-sm text-slate-500">로컬 MP3 · 내 레벨 Lv.{userState.level}</p>
         </CardHeader>
       </Card>
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {CATEGORIES.map((key) => (
-          <button
-            key={key}
-            onClick={() => setCategory(key)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              category === key
-                ? 'bg-sky-500 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-sky-50'
-            }`}
-          >
-            {EMOTION_LABELS[key]}
-          </button>
-        ))}
-      </div>
-
-      {loading && (
-        <Card className="mb-4">
-          <CardContent className="py-6 text-center text-sm text-slate-500">
-            {EMOTION_LABELS[category]} 플레이리스트 불러오는 중…
-          </CardContent>
-        </Card>
-      )}
-
-      {error && (
-        <Card className="mb-4 border-amber-200 bg-amber-50">
-          <CardContent className="py-4 text-center text-sm text-amber-800">
-            API 연결 실패 — 오프라인 기본 음악을 사용합니다.
-          </CardContent>
-        </Card>
-      )}
-
-      {music.length === 0 && !loading && (
-        <Card className="mb-4">
-          <CardContent className="py-6 text-center text-sm text-slate-500">
-            재생할 음악이 없습니다. 잠시 후 다시 시도해 주세요.
-          </CardContent>
-        </Card>
-      )}
-
       <ul className="space-y-2">
-        {music.map((track, index) => {
+        {TRACKS.map((track) => {
+          const locked = userState.level < track.levelRequired;
           const active = isPlaying && currentMusic?.id === track.id;
           return (
             <li key={track.id}>
               <button
-                onClick={() => void playTrack(index)}
+                onClick={() => void playTrack(track.id)}
                 className={`w-full rounded-2xl border p-4 text-left transition-colors ${
-                  active
-                    ? 'border-sky-300 bg-sky-50'
-                    : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/30'
+                  locked
+                    ? 'border-slate-100 bg-slate-50 opacity-60'
+                    : active
+                      ? 'border-sky-300 bg-sky-50'
+                      : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/30'
                 }`}
               >
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-slate-800">{track.title}</p>
-                    <p className="text-xs text-slate-400">
-                      {formatDuration(track.duration)} · {track.tags.slice(0, 2).join(', ')}
-                    </p>
+                    <p className="text-xs text-slate-400">{track.duration}</p>
                   </div>
-                  <span className="text-sky-500">{active ? '⏸' : '▶'}</span>
+                  {locked ? (
+                    <span className="text-xs font-medium text-rose-500">Lv.{track.levelRequired}</span>
+                  ) : (
+                    <span className="text-sky-500">{active ? '⏸' : '▶'}</span>
+                  )}
                 </div>
               </button>
             </li>
@@ -113,7 +78,7 @@ export function LibraryPage() {
 
       <Card className="mt-4">
         <CardContent className="py-3 text-center text-xs text-slate-400">
-          Cache → Serverless API → 기본 리소스 순으로 제공됩니다.
+          트랙 클릭 시 음악 자동 ON + 재생
         </CardContent>
       </Card>
     </AppLayout>
