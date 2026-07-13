@@ -13,13 +13,17 @@ const LOUDLY_MOOD: Record<EmotionCategory, string> = {
   happy: 'Laid Back',
 };
 
+interface LoudlyTag {
+  name: string;
+}
+
 interface LoudlySong {
   id: string;
   title: string;
   duration?: number;
   music_file_path?: string;
-  genre?: string[];
-  mood?: string[];
+  genres?: LoudlyTag[];
+  moods?: LoudlyTag[];
 }
 
 interface LoudlySongsResponse {
@@ -29,12 +33,11 @@ interface LoudlySongsResponse {
 export class LoudlyProvider implements MusicProvider {
   constructor(private readonly apiKey: string) {}
 
-  async search(category: EmotionCategory, query: string): Promise<MusicItem[]> {
+  async search(category: EmotionCategory, _query: string): Promise<MusicItem[]> {
     if (!this.apiKey) return [];
 
     const mood = LOUDLY_MOOD[category];
     const params = new URLSearchParams({ limit: '8', mood });
-    if (query) params.set('genre', query.split(' ')[0]);
 
     const res = await fetch(`${LOUDLY_BASE}/api/songs?${params}`, {
       headers: {
@@ -43,7 +46,10 @@ export class LoudlyProvider implements MusicProvider {
       },
     });
 
-    if (!res.ok) throw new Error(`Loudly API ${res.status}`);
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Loudly API ${res.status}: ${body.slice(0, 120)}`);
+    }
 
     const data = (await res.json()) as LoudlySongsResponse;
     return (data.items ?? [])
@@ -55,7 +61,10 @@ export class LoudlyProvider implements MusicProvider {
           title: song.title,
           url: song.music_file_path,
           duration: Math.max(30, Math.round(durationMs / 1000)),
-          tags: [...(song.mood ?? []), ...(song.genre ?? [])],
+          tags: [
+            ...(song.moods?.map((t) => t.name) ?? []),
+            ...(song.genres?.map((t) => t.name) ?? []),
+          ],
           category,
         } satisfies MusicItem;
       })

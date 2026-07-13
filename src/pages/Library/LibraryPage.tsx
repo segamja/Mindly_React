@@ -26,8 +26,12 @@ export function LibraryPage() {
     const track = music[index];
     if (!track) return;
     if (!musicEnabled) toggleMusic();
-    await play(track, category);
-    addXp(XP_REWARDS.audioPlay, track.title);
+    try {
+      await play(track, category);
+      addXp(XP_REWARDS.audioPlay, track.title);
+    } catch {
+      alert('음악을 재생할 수 없습니다. 네트워크 연결을 확인해 주세요.');
+    }
   };
 
   return (
@@ -67,6 +71,14 @@ export function LibraryPage() {
         <Card className="mb-4 border-amber-200 bg-amber-50">
           <CardContent className="py-4 text-center text-sm text-amber-800">
             API 연결 실패 — 오프라인 기본 음악을 사용합니다.
+          </CardContent>
+        </Card>
+      )}
+
+      {music.length === 0 && !loading && (
+        <Card className="mb-4">
+          <CardContent className="py-6 text-center text-sm text-slate-500">
+            재생할 음악이 없습니다. 잠시 후 다시 시도해 주세요.
           </CardContent>
         </Card>
       )}

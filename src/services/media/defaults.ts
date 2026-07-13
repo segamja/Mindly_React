@@ -1,10 +1,7 @@
 import type { EmotionCategory, ImageItem, MusicItem } from '@/types/media';
 
 const DEFAULT_IMAGE = 'assets/default/default.svg';
-
-/** Freesound preview URL — API Key 없이도 재생 가능한 오프라인 폴백 */
-const FALLBACK_AUDIO =
-  'https://freesound.org/data/previews/346/346847_4939433-lq.mp3';
+const LOCAL_DEFAULT = 'assets/default/default.mp3';
 
 function music(
   id: string,
@@ -24,23 +21,23 @@ function image(id: string, category: EmotionCategory, url: string, author: strin
 /** API·캐시 모두 실패 시 사용하는 오프라인 기본 리소스 */
 export const DEFAULT_MUSIC: Record<EmotionCategory, MusicItem[]> = {
   stress: [
-    music('default-stress-rain', '잔잔한 빗소리', 'stress', FALLBACK_AUDIO, ['rain', 'calm']),
-    music('default-stress-forest', '숲속 명상', 'stress', FALLBACK_AUDIO, ['forest', 'calm'], 240),
+    music('default-stress-rain', '잔잔한 빗소리', 'stress', LOCAL_DEFAULT, ['rain', 'calm']),
+    music('default-stress-forest', '숲속 명상', 'stress', LOCAL_DEFAULT, ['forest', 'calm'], 240),
   ],
   anxiety: [
-    music('default-anxiety-ocean', '파도 소리', 'anxiety', FALLBACK_AUDIO, ['ocean', 'waves']),
+    music('default-anxiety-ocean', '파도 소리', 'anxiety', LOCAL_DEFAULT, ['ocean', 'waves']),
   ],
   burnout: [
-    music('default-burnout-meditation', '회복 명상', 'burnout', FALLBACK_AUDIO, ['meditation'], 300),
+    music('default-burnout-meditation', '회복 명상', 'burnout', LOCAL_DEFAULT, ['meditation'], 300),
   ],
   focus: [
-    music('default-focus-noise', '화이트 노이즈', 'focus', FALLBACK_AUDIO, ['white noise'], 300),
+    music('default-focus-noise', '화이트 노이즈', 'focus', LOCAL_DEFAULT, ['white noise'], 300),
   ],
   relax: [
-    music('default-relax-piano', '피아노 앰비언트', 'relax', FALLBACK_AUDIO, ['piano', 'ambient']),
+    music('default-relax-piano', '피아노 앰비언트', 'relax', LOCAL_DEFAULT, ['piano', 'ambient']),
   ],
   happy: [
-    music('default-happy-acoustic', '어쿠스틱 힐링', 'happy', FALLBACK_AUDIO, ['acoustic']),
+    music('default-happy-acoustic', '어쿠스틱 힐링', 'happy', LOCAL_DEFAULT, ['acoustic']),
   ],
 };
 

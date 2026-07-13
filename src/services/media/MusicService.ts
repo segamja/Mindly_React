@@ -16,9 +16,18 @@ function parseCategory(value: string | null | undefined): EmotionCategory {
 
 async function fetchFromApi(category: EmotionCategory): Promise<MusicItem[]> {
   const base = getApiBase();
-  const url = `${base}/api/media/music?category=${category}`;
+  if (import.meta.env.PROD && !base) {
+    throw new Error('Static host — skip remote media API');
+  }
+  const url = import.meta.env.DEV
+    ? `/api/media/music?category=${category}`
+    : `${base}/api/media/music?category=${category}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Music API ${res.status}`);
+  const contentType = res.headers.get('content-type') ?? '';
+  if (!contentType.includes('application/json')) {
+    throw new Error('Music API returned non-JSON');
+  }
   const data = (await res.json()) as { items?: MusicItem[] };
   return data.items ?? [];
 }

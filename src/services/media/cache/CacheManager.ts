@@ -1,6 +1,6 @@
 import type { EmotionCategory, ImageItem, MediaCacheEntry, MusicCacheMeta, MusicItem } from '@/types/media';
 
-const MUSIC_META_KEY = 'mindly_music_cache_meta';
+const MUSIC_META_KEY = 'mindly_music_cache_v3';
 const IMAGE_CACHE_PREFIX = 'mindly_image_cache_';
 const MUSIC_MAX_ENTRIES = 20;
 const IMAGE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
