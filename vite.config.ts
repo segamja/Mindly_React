@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { APP_VERSION, SW_CACHE_VERSION } from './src/config/version';
 
 export default defineConfig({
-  base: '/OfficeCalm_Ai/',
+  base: '/Mindly_React/',
   plugins: [
     react(),
     tailwindcss(),
@@ -15,7 +15,7 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/images/care.png'],
       manifest: {
-        id: '/OfficeCalm_Ai/',
+        id: '/Mindly_React/',
         name: 'Mindly',
         short_name: 'Mindly',
         description: 'Your AI Mind Coach — 직장인을 위한 AI 멘탈 케어',
@@ -24,23 +24,23 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         lang: 'ko',
-        start_url: '/OfficeCalm_Ai/',
-        scope: '/OfficeCalm_Ai/',
+        start_url: '/Mindly_React/',
+        scope: '/Mindly_React/',
         icons: [
           {
-            src: '/OfficeCalm_Ai/assets/icons/icon-192.png',
+            src: '/Mindly_React/assets/icons/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/OfficeCalm_Ai/assets/icons/icon-512.png',
+            src: '/Mindly_React/assets/icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/OfficeCalm_Ai/assets/icons/icon-512.png',
+            src: '/Mindly_React/assets/icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -51,7 +51,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
         globIgnores: ['**/calm-*.jpg', '**/*.mp3'],
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/OfficeCalm_Ai\/assets\//],
+        navigateFallbackDenylist: [/^\/Mindly_React\/assets\//],
         runtimeCaching: [
           {
             urlPattern: /\/assets\/audio\/.*\.mp3$/i,

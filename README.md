@@ -4,9 +4,9 @@
 
 백엔드 없이 브라우저만으로 동작하며, 사용자 데이터·XP·감사일기·레벨은 **localStorage**에 저장됩니다.
 
-**라이브 데모:** [https://segamja.github.io/OfficeCalm_Ai/](https://segamja.github.io/OfficeCalm_Ai/)
+**라이브 데모:** [https://segamja.github.io/Mindly_React/](https://segamja.github.io/Mindly_React/)
 
-**MVP 버전:** v2.2 (2026-07-11)
+**버전:** v3.0.0 (React + Vite)
 
 ---
 
