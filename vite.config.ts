@@ -5,6 +5,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { APP_VERSION, SW_CACHE_VERSION } from './src/config/version';
 
+const PROD_BASE = '/Mindly_React/';
+
 function versionJsonPlugin(): Plugin {
   return {
     name: 'mindly-version-json',
@@ -26,100 +28,105 @@ function versionJsonPlugin(): Plugin {
   };
 }
 
-export default defineConfig({
-  base: '/Mindly_React/',
-  plugins: [
-    react(),
-    tailwindcss(),
-    versionJsonPlugin(),
-    VitePWA({
-      registerType: 'prompt',
-      injectRegister: false,
-      includeAssets: ['assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/images/care.png'],
-      manifest: {
-        id: '/Mindly_React/',
-        name: 'Mindly',
-        short_name: 'Mindly',
-        description: 'Your AI Mind Coach — 직장인을 위한 AI 멘탈 케어',
-        theme_color: '#38bdf8',
-        background_color: '#0f172a',
-        display: 'standalone',
-        orientation: 'portrait',
-        lang: 'ko',
-        start_url: '/Mindly_React/',
-        scope: '/Mindly_React/',
-        icons: [
-          {
-            src: '/Mindly_React/assets/icons/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: '/Mindly_React/assets/icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: '/Mindly_React/assets/icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
-        globIgnores: ['**/calm-*.jpg', '**/*.mp3'],
-        navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/Mindly_React\/assets\//],
-        runtimeCaching: [
-          {
-            urlPattern: /\/version\.json$/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'mindly-version',
-              expiration: { maxEntries: 1, maxAgeSeconds: 60 },
+export default defineConfig(({ mode }) => {
+  const base = mode === 'production' ? PROD_BASE : '/';
+
+  return {
+    base,
+    plugins: [
+      react(),
+      tailwindcss(),
+      versionJsonPlugin(),
+      VitePWA({
+        registerType: 'prompt',
+        injectRegister: false,
+        includeAssets: ['assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/images/care.png'],
+        manifest: {
+          id: base,
+          name: 'Mindly',
+          short_name: 'Mindly',
+          description: 'Your AI Mind Coach — 직장인을 위한 AI 멘탈 케어',
+          theme_color: '#38bdf8',
+          background_color: '#0f172a',
+          display: 'standalone',
+          orientation: 'portrait',
+          lang: 'ko',
+          start_url: base,
+          scope: base,
+          icons: [
+            {
+              src: `${base}assets/icons/icon-192.png`,
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any',
             },
-          },
-          {
-            urlPattern: /\/assets\/audio\/.*\.mp3$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'mindly-audio',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            {
+              src: `${base}assets/icons/icon-512.png`,
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any',
             },
-          },
-          {
-            urlPattern: /\/assets\/images\/.*\.(jpg|jpeg|png)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'mindly-images',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            {
+              src: `${base}assets/icons/icon-512.png`,
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable',
             },
-          },
-        ],
+          ],
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
+          globIgnores: ['**/calm-*.jpg', '**/*.mp3'],
+          navigateFallback: 'index.html',
+          navigateFallbackDenylist: [/^\/Mindly_React\/assets\//, /^\/assets\//],
+          runtimeCaching: [
+            {
+              urlPattern: /\/version\.json$/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'mindly-version',
+                expiration: { maxEntries: 1, maxAgeSeconds: 60 },
+              },
+            },
+            {
+              urlPattern: /\/assets\/audio\/.*\.mp3$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'mindly-audio',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+            {
+              urlPattern: /\/assets\/images\/.*\.(jpg|jpeg|png)$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'mindly-images',
+                expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+          ],
+        },
+        devOptions: {
+          enabled: true,
+          type: 'module',
+        },
+      }),
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
-      devOptions: {
-        enabled: true,
-        type: 'module',
-      },
-    }),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-  },
-  define: {
-    __APP_VERSION__: JSON.stringify(APP_VERSION),
-    __SW_CACHE_VERSION__: JSON.stringify(SW_CACHE_VERSION),
-  },
-  server: {
-    port: 5173,
-  },
-  build: {
-    outDir: 'dist',
-  },
+    define: {
+      __APP_VERSION__: JSON.stringify(APP_VERSION),
+      __SW_CACHE_VERSION__: JSON.stringify(SW_CACHE_VERSION),
+    },
+    server: {
+      port: 5173,
+      open: '/',
+    },
+    build: {
+      outDir: 'dist',
+    },
+  };
 });
