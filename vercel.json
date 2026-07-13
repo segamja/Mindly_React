@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/media/music", "destination": "/api/media/music.ts" },
+    { "source": "/api/media/images", "destination": "/api/media/images.ts" }
+  ]
+}

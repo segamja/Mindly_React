@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { APP_VERSION, SW_CACHE_VERSION } from './src/config/version';
+import { mediaApiPlugin } from './vite-plugin-media-api';
 
 const PROD_BASE = '/Mindly_React/';
 
@@ -36,6 +37,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tailwindcss(),
+      mediaApiPlugin(),
       versionJsonPlugin(),
       VitePWA({
         registerType: 'prompt',
@@ -89,19 +91,35 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /\/assets\/audio\/.*\.mp3$/i,
+              urlPattern: /soundtracks\.loudly\.com/i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'mindly-audio',
-                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
+                cacheName: 'mindly-loudly-audio',
+                expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
               },
             },
             {
-              urlPattern: /\/assets\/images\/.*\.(jpg|jpeg|png)$/i,
+              urlPattern: /freesound\.org\/data\/previews\//i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'mindly-images',
+                cacheName: 'mindly-remote-audio',
                 expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+            {
+              urlPattern: /images\.unsplash\.com/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'mindly-remote-images',
+                expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              },
+            },
+            {
+              urlPattern: /\/assets\/default\//i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'mindly-default-media',
+                expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 365 },
               },
             },
           ],
@@ -124,6 +142,9 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: '/',
+      watch: {
+        ignored: ['**/docs/**', '**/dist/**', '**/legacy/**'],
+      },
     },
     build: {
       outDir: 'dist',
