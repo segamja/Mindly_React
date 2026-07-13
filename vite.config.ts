@@ -1,15 +1,37 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { APP_VERSION, SW_CACHE_VERSION } from './src/config/version';
 
+function versionJsonPlugin(): Plugin {
+  return {
+    name: 'mindly-version-json',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify(
+          {
+            appVersion: APP_VERSION,
+            swCacheVersion: SW_CACHE_VERSION,
+            builtAt: new Date().toISOString(),
+          },
+          null,
+          2,
+        ),
+      });
+    },
+  };
+}
+
 export default defineConfig({
   base: '/Mindly_React/',
   plugins: [
     react(),
     tailwindcss(),
+    versionJsonPlugin(),
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
@@ -54,6 +76,14 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/Mindly_React\/assets\//],
         runtimeCaching: [
           {
+            urlPattern: /\/version\.json$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'mindly-version',
+              expiration: { maxEntries: 1, maxAgeSeconds: 60 },
+            },
+          },
+          {
             urlPattern: /\/assets\/audio\/.*\.mp3$/i,
             handler: 'CacheFirst',
             options: {
@@ -72,7 +102,8 @@ export default defineConfig({
         ],
       },
       devOptions: {
-        enabled: false,
+        enabled: true,
+        type: 'module',
       },
     }),
   ],

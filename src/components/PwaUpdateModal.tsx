@@ -1,15 +1,26 @@
 import { Button } from '@/components/ui/button';
 import { APP_VERSION, SW_CACHE_VERSION } from '@/config/version';
+import type { RemoteVersionInfo } from '@/services/versionService';
 
 interface PwaUpdateModalProps {
   open: boolean;
   isStandalone: boolean;
+  remoteVersion: RemoteVersionInfo | null;
   onUpdate: () => void;
   onDismiss: () => void;
 }
 
-export function PwaUpdateModal({ open, isStandalone, onUpdate, onDismiss }: PwaUpdateModalProps) {
+export function PwaUpdateModal({
+  open,
+  isStandalone,
+  remoteVersion,
+  onUpdate,
+  onDismiss,
+}: PwaUpdateModalProps) {
   if (!open) return null;
+
+  const nextVersion = remoteVersion?.appVersion ?? APP_VERSION;
+  const nextCache = remoteVersion?.swCacheVersion ?? SW_CACHE_VERSION;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
@@ -24,10 +35,18 @@ export function PwaUpdateModal({ open, isStandalone, onUpdate, onDismiss }: PwaU
             새 버전이 있습니다
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            Mindly v{APP_VERSION} 업데이트가 준비되었습니다.
-            {isStandalone ? ' 앱을 최신 상태로 유지하려면 업데이트해 주세요.' : ' 새로고침하면 적용됩니다.'}
+            {isStandalone
+              ? '앱을 다시 실행했을 때 새 버전이 감지되었습니다. 업데이트해 주세요.'
+              : '새 버전이 배포되었습니다. 업데이트하면 최신 기능을 사용할 수 있습니다.'}
           </p>
-          <p className="mt-1 text-xs text-slate-400">캐시: {SW_CACHE_VERSION}</p>
+          <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            <p>
+              현재 v{APP_VERSION} → 최신 v{nextVersion}
+            </p>
+            <p className="mt-1 text-slate-400">
+              {SW_CACHE_VERSION} → {nextCache}
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">

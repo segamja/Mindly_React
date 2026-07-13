@@ -5,11 +5,13 @@ import { PwaUpdateModal } from '@/components/PwaUpdateModal';
 interface PwaContextValue {
   isStandalone: boolean;
   appVersion: string;
+  swCacheVersion: string;
 }
 
 const PwaContext = createContext<PwaContextValue>({
   isStandalone: false,
   appVersion: '3.0.0',
+  swCacheVersion: 'mindly-v3.0.0',
 });
 
 export function usePwaContext() {
@@ -17,14 +19,23 @@ export function usePwaContext() {
 }
 
 export function PwaProvider({ children }: { children: React.ReactNode }) {
-  const { showUpdateModal, applyUpdate, dismissUpdate, isStandalone, appVersion } = usePwaUpdate();
+  const {
+    showUpdateModal,
+    applyUpdate,
+    dismissUpdate,
+    isStandalone,
+    appVersion,
+    swCacheVersion,
+    remoteVersion,
+  } = usePwaUpdate();
 
   return (
-    <PwaContext.Provider value={{ isStandalone, appVersion }}>
+    <PwaContext.Provider value={{ isStandalone, appVersion, swCacheVersion }}>
       {children}
       <PwaUpdateModal
         open={showUpdateModal}
         isStandalone={isStandalone}
+        remoteVersion={remoteVersion}
         onUpdate={applyUpdate}
         onDismiss={dismissUpdate}
       />
