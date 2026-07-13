@@ -6,7 +6,7 @@
   "description": "Mindly — AI Mind Coach (React + Vite)",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/copy-404.mjs",
     "preview": "vite preview",
     "legacy": "npx serve legacy -l 3001"
   },
