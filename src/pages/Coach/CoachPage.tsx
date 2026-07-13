@@ -4,30 +4,17 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateCustomScript, getPresetScript, PRESET_LIST } from '@/data/content';
-import { useMediaPlayer } from '@/hooks/useMediaPlayer';
-import { getLocalTrackById } from '@/services/media/localMusic';
 import { useMindlyStore } from '@/store/useMindlyStore';
 import type { PresetKey } from '@/types';
-import { PRESET_BGM } from '@/utils/progress';
 
 export function CoachPage() {
   const navigate = useNavigate();
-  const { nickname, runAiScript, musicEnabled } = useMindlyStore();
-  const { play } = useMediaPlayer();
+  const { nickname, runAiScript } = useMindlyStore();
   const [script, setScript] = useState('');
   const [typing, setTyping] = useState(false);
   const [done, setDone] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const startPresetMusic = useCallback(
-    async (preset: PresetKey) => {
-      if (!musicEnabled) return;
-      const track = getLocalTrackById(PRESET_BGM[preset]);
-      if (track) await play(track);
-    },
-    [musicEnabled, play],
-  );
 
   const typeText = useCallback((text: string, onComplete?: () => void) => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -54,7 +41,6 @@ export function CoachPage() {
     const preset = getPresetScript(key);
     typeText(preset.script, () => {
       runAiScript(key, preset.label);
-      void startPresetMusic(key);
     });
   };
 
@@ -62,7 +48,6 @@ export function CoachPage() {
     const text = generateCustomScript(customInput);
     typeText(text, () => {
       runAiScript('custom', customInput || '맞춤');
-      void startPresetMusic('custom');
     });
   };
 

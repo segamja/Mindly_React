@@ -78,7 +78,7 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
-          globIgnores: ['**/calm-*.jpg'],
+          globIgnores: ['**/calm-*.jpg', '**/*.mp3'],
           navigateFallback: 'index.html',
           navigateFallbackDenylist: [/^\/Mindly_React\/assets\//, /^\/assets\//],
           runtimeCaching: [
@@ -94,40 +94,16 @@ export default defineConfig(({ mode }) => {
               urlPattern: /\/assets\/audio\/.*\.mp3$/i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'mindly-local-audio',
-                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+                cacheName: 'mindly-audio',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
               },
             },
             {
-              urlPattern: /soundtracks\.loudly\.com/i,
+              urlPattern: /\/assets\/images\/.*\.(jpg|jpeg|png)$/i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'mindly-loudly-audio',
+                cacheName: 'mindly-images',
                 expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              },
-            },
-            {
-              urlPattern: /freesound\.org\/data\/previews\//i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'mindly-remote-audio',
-                expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              },
-            },
-            {
-              urlPattern: /images\.unsplash\.com/i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'mindly-remote-images',
-                expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
-              },
-            },
-            {
-              urlPattern: /\/assets\/default\//i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'mindly-default-media',
-                expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 365 },
               },
             },
           ],

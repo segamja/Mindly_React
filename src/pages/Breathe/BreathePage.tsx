@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useImages } from '@/hooks/useImages';
+import { GALLERY_IMAGES } from '@/data/content';
 import { useMindlyStore } from '@/store/useMindlyStore';
-import { PRESET_EMOTION } from '@/types/media';
+import { assetUrl } from '@/utils';
 import { BREATHE_RECOMMENDATIONS } from '@/utils/progress';
 
 const PHASES = [
@@ -20,9 +20,6 @@ export function BreathePage() {
 
   const preset = userState.lastPreset || 'default';
   const recommendation = BREATHE_RECOMMENDATIONS[preset] ?? BREATHE_RECOMMENDATIONS.default;
-  const emotion =
-    preset === 'default' ? 'relax' : PRESET_EMOTION[preset as keyof typeof PRESET_EMOTION];
-  const { images, loading } = useImages(emotion);
 
   useEffect(() => {
     const phase = PHASES[phaseIdx];
@@ -39,14 +36,12 @@ export function BreathePage() {
   }, [cycles, completeMission]);
 
   useEffect(() => {
-    if (images.length <= 1) return;
     const timer = setInterval(() => {
-      setGalleryIdx((i) => (i + 1) % images.length);
+      setGalleryIdx((i) => (i + 1) % GALLERY_IMAGES.length);
     }, 8000);
     return () => clearInterval(timer);
-  }, [images.length]);
+  }, []);
 
-  const currentImage = images[galleryIdx] ?? images[0];
   const phase = PHASES[phaseIdx];
 
   return (
@@ -69,19 +64,13 @@ export function BreathePage() {
       </div>
 
       <Card className="overflow-hidden">
-        {loading || !currentImage ? (
-          <div className="flex h-48 items-center justify-center bg-slate-100 text-sm text-slate-400">
-            힐링 이미지 불러오는 중…
-          </div>
-        ) : (
-          <img
-            src={currentImage.url}
-            alt="힐링 이미지"
-            className="h-48 w-full object-cover transition-opacity duration-500"
-          />
-        )}
+        <img
+          src={assetUrl(GALLERY_IMAGES[galleryIdx])}
+          alt="힐링 이미지"
+          className="h-48 w-full object-cover transition-opacity duration-500"
+        />
         <CardContent className="py-3 text-center text-xs text-slate-400">
-          {currentImage ? `Photo by ${currentImage.author} · 8초마다 전환` : 'AI 감정 기반 갤러리'}
+          힐링 갤러리 · 8초마다 전환
         </CardContent>
       </Card>
     </AppLayout>

@@ -131,3 +131,12 @@ export const TRACKS = [
   { id: 'deep-sleep', title: '야근 후 딥슬립', duration: '20분', levelRequired: 3, src: 'assets/audio/deep-sleep.mp3' },
   { id: 'burnout-recovery', title: '번아웃 회복 명상', duration: '15분', levelRequired: 5, src: 'assets/audio/burnout-recovery.mp3' },
 ] as const;
+
+export const GALLERY_IMAGES = [
+  'assets/images/calm-01.jpg',
+  'assets/images/calm-02.jpg',
+  'assets/images/calm-03.jpg',
+  'assets/images/calm-04.jpg',
+  'assets/images/calm-05.jpg',
+  'assets/images/calm-06.jpg',
+];
